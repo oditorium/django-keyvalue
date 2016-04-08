@@ -162,8 +162,9 @@ then `kvs` and `kvs2` are distinct namespaces, but their parent is the same `aaa
 
 Hierarchical namespaces are merged, with higher up-definitions hiding those below. For example
 
-	kvs_b = KeyValueStorage.kvs_get("aaa::bbb", "::")
-	kvs_c = KeyValueStorage.kvs_get("aaa::ccc", "::")
+	kvs_b = KeyValueStorage.kvs_get("aaa::bbb", True)
+		# equivalent: kvs_b = KeyValueStorage.kvs_get(["aaa", "bbb"])
+	kvs_c = KeyValueStorage.kvs_get("aaa::ccc", True)
 	kvs_a = kvs_b.parent
 
 	kvs_a["1"] = "a1"
@@ -226,5 +227,6 @@ This code is based on a [snippet](https://djangosnippets.org/snippets/2451/) by 
 The idea is to use [semantic versioning](http://semver.org/), even though initially we might make some minor
 API changes without bumping the major version number. Be warned!
 
+- **v2.1** allowing the namespace to be a list
 - **v2.0** added hierarchical storage (initial published version of the library)
 - **v1.0** key value storage with completely independent segments (not hierarchical)

@@ -10,8 +10,8 @@ Licensed under the MIT License <https://opensource.org/licenses/MIT>.
 
 based on https://djangosnippets.org/snippets/2451/ by Morgul
 """
-__version__ = "2.0"
-__version_dt__ = "2016-04-04"
+__version__ = "2.1"
+__version_dt__ = "2016-04-08"
 __copyright__ = "Stefan LOESCH, oditorium 2016"
 __license__ = "MIT"
 
@@ -27,6 +27,15 @@ class KeyValueStoreBase(object):
     """
     abstract base class defining the key-value store interface
     """
+
+    @property
+    def namespace(self):
+        raise NotImplementedError()
+
+    hierarchy_separator = "::"
+        # that's the default separator for hierarchic namespaces
+        # only change in derived (model!) classes to ensure that within
+        # a database table this value is consistent
 
     ##################################################################
     ## DICT INTERFACE PROPERTIES AND METHODS
@@ -403,9 +412,19 @@ class KeyValueStore(KeyValueStoreBase, models.Model):
         - if `hierarchy_separator` is None the namespace will not have any parents; if it is a string,
             then this string is used to separate hierarchies in the namespace; if it is True, the default
             hierarchy separator "::" is used
+        - if `namespace` is a list (of strings) then those are interpreted as a hierarchy; the actual namespace
+            is then obtained by either concatenating them with the default hierarchy separator, or with the 
+            one that has been given
         """
         if namespace == None: namespace = ""
-        if hierarchy_separator == True: hierarchy_separator='::'
+        if isinstance(namespace, list) and not isinstance(hierarchy_separator, str): hierarchy_separator = True
+        if hierarchy_separator == True: hierarchy_separator=cls.hierarchy_separator
+        if isinstance(namespace, list): namespace = hierarchy_separator.join(namespace)
+            # some parameter normalisations
+            # - allow for None as alias for the blank namespace
+            # - if namespace is a list then change hierarchy_separator default to True
+            # - set hierarchy separator from class defaults if not explicitly given
+            # - convert list namespace into a properly separated one
 
         try: kvs = cls._kvs_retrieve(namespace)
         except:

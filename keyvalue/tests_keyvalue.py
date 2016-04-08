@@ -275,7 +275,27 @@ class KeyValueTest(TestCase):
         
         del kvs1["in1"]
         s.assertEqual("in1" in kvs2, False)
-		
+
+        def test_hierarchic_list(s):
+            """test hierarchic namespaces with list"""
+            
+            kvs  = s.KVS.kvs_get(["thl","aaa"])
+            kvs0 = s.KVS.kvs_get(["thl"])
+            s.assertEqual( kvs.height,  2)
+            s.assertEqual( kvs.namespace,  s.KVS.hierarchy_separator.join(["thl","aaa"]))
+            s.assertEqual( kvs._parent,  kvs0)
+            s.assertEqual( kvs.parent,  kvs0)
+            s.assertTrue( isinstance (kvs0.parent, NullKeyValueStore) )
+            
+        
+        def test_defaults(s):
+            """test defaults"""
+            s.assertEqual( s.KVS.hierarchy_separator,  "::")
+
+                
+            
+            
+            
 
         
         
